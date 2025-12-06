@@ -19,6 +19,14 @@
 
 ## 🚀 Features
 
+### SpoonAI Integration (NEW! 🥄)
+- **Multi-Agent System** - Specialized AI agents for optimization, blockchain, carbon tracking
+- **40% Token Reduction** - SpoonAI-powered prompt optimization
+- **Multi-Provider Fallback** - Automatic switching between OpenAI, Anthropic, Google
+- **MCP Integration** - Secure tool execution via Model Context Protocol
+- **Blockchain Agents** - Neo N3 operations and smart contract interaction
+- **Carbon Tracking** - Real-time CO2 emission monitoring
+
 ### Dashboard View
 - **Token Usage Chart** - Beautiful area chart with neobrutalism styling
 - **Eco Score Gauge** - Circular progress indicator
@@ -59,6 +67,9 @@ The app will open at `http://localhost:3000`
 - **Charts**: Recharts
 - **Build Tool**: Vite 5.0
 - **Fonts**: Space Grotesk (Google Fonts)
+- **AI Agents**: SpoonAI (Multi-agent system)
+- **Blockchain**: Neo N3 (via @rentfuse-labs adapter)
+- **3D Graphics**: Three.js + React Three Fiber
 
 ## 📐 Component Library
 
