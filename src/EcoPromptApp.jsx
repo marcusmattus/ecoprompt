@@ -4,6 +4,7 @@ import NeoWalletButton, { NeoWalletInfoCard } from './NeoWalletButton';
 import NeoTransactionTest from './NeoTransactionTest';
 import ProfileSetup from './components/ProfileSetup';
 import { PluginManager } from './components/plugin-manager/PluginManager';
+import SpoonAIIntegration from './components/SpoonAIIntegration';
 import NodeUniverse from './NodeUniverse';
 import { 
   BarChart, 
@@ -620,6 +621,7 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'optimizer', label: 'Optimizer', icon: Zap },
+    { id: 'spoonai', label: 'SpoonAI', icon: Sparkles },
     { id: 'plugins', label: 'Plugins', icon: Puzzle },
     { id: 'universe', label: 'Node Universe', icon: Globe },
     { id: 'wallet', label: 'Wallet', icon: Wallet },
@@ -805,6 +807,9 @@ export default function EcoPromptApp() {
           
           {/* Plugin Manager */}
           {activeTab === 'plugins' && <PluginManager />}
+          
+          {/* SpoonAI Integration */}
+          {activeTab === 'spoonai' && <SpoonAIIntegration />}
           
           {/* Wallet View */}
           {activeTab === 'wallet' && (

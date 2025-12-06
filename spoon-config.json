@@ -1,0 +1,167 @@
+{
+  "agents": {
+    "prompt_optimizer": {
+      "class_name": "SpoonReactAI",
+      "description": "AI agent for optimizing prompts and reducing token usage",
+      "config": {
+        "llm_provider": "openai",
+        "model_name": "gpt-4-turbo",
+        "temperature": 0.7,
+        "max_tokens": 2048
+      },
+      "tools": [
+        {
+          "name": "prompt_analyzer",
+          "type": "builtin",
+          "description": "Analyzes prompt complexity and suggests optimizations"
+        },
+        {
+          "name": "token_counter",
+          "type": "builtin",
+          "description": "Counts tokens in prompts accurately"
+        },
+        {
+          "name": "calculator",
+          "type": "builtin",
+          "description": "Calculates cost savings and carbon reduction"
+        }
+      ]
+    },
+    "blockchain_agent": {
+      "class_name": "SpoonReactAI",
+      "description": "Agent for Neo blockchain interactions and wallet management",
+      "config": {
+        "llm_provider": "anthropic",
+        "model_name": "claude-3-sonnet",
+        "temperature": 0.5
+      },
+      "tools": [
+        {
+          "name": "neo_wallet",
+          "type": "mcp",
+          "mcp_server": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-neo"],
+            "env": {
+              "NEO_RPC_URL": "https://testnet1.neo.coz.io:443"
+            }
+          }
+        },
+        {
+          "name": "neo_security",
+          "type": "custom",
+          "description": "Security detection for Neo smart contracts"
+        }
+      ]
+    },
+    "carbon_tracker": {
+      "class_name": "SpoonReactAI",
+      "description": "Tracks and calculates carbon footprint of AI operations",
+      "config": {
+        "llm_provider": "openai",
+        "model_name": "gpt-3.5-turbo",
+        "temperature": 0.3
+      },
+      "tools": [
+        {
+          "name": "carbon_calculator",
+          "type": "builtin",
+          "description": "Calculates CO2 emissions from AI model usage"
+        },
+        {
+          "name": "analytics",
+          "type": "builtin",
+          "description": "Generates analytics reports"
+        }
+      ]
+    },
+    "multi_provider_agent": {
+      "class_name": "SpoonReactAI",
+      "description": "Agent that uses multiple AI providers with fallback",
+      "config": {
+        "llm_provider": "openai",
+        "model_name": "gpt-4",
+        "temperature": 0.7,
+        "fallback_providers": [
+          {
+            "provider": "anthropic",
+            "model": "claude-3-opus"
+          },
+          {
+            "provider": "google",
+            "model": "gemini-pro"
+          }
+        ]
+      },
+      "tools": [
+        "tavily_search",
+        "calculator",
+        "prompt_optimizer"
+      ]
+    }
+  },
+  "default_agent": "prompt_optimizer",
+  "mcp_servers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./data"
+      ]
+    },
+    "neo_blockchain": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-neo"
+      ],
+      "env": {
+        "NEO_RPC_URL": "https://testnet1.neo.coz.io:443",
+        "NEO_NETWORK": "TestNet"
+      }
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "."
+      ]
+    }
+  },
+  "api_keys": {
+    "openai": "${OPENAI_API_KEY}",
+    "anthropic": "${ANTHROPIC_API_KEY}",
+    "google": "${GOOGLE_API_KEY}",
+    "cohere": "${COHERE_API_KEY}",
+    "tavily": "${TAVILY_API_KEY}"
+  },
+  "features": {
+    "auto_optimize": true,
+    "carbon_tracking": true,
+    "cost_analytics": true,
+    "blockchain_integration": true,
+    "multi_provider_fallback": true,
+    "caching": {
+      "enabled": true,
+      "ttl": 3600,
+      "strategy": "lru"
+    },
+    "rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 60
+    }
+  },
+  "storage": {
+    "type": "neofs",
+    "endpoint": "${NEOFS_ENDPOINT}",
+    "wallet": "${NEOFS_WALLET}"
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "output": "logs/spoonai.log"
+  }
+}
