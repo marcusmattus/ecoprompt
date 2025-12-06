@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Palette - Neobrutalism */
+  --neo-green: #00E599;
+  --brutal-black: #0A0A0F;
+  --brutal-white: #FEFEFE;
+  --brutal-yellow: #FFD93D;
+  --brutal-pink: #FF6BCB;
+  --brutal-blue: #4FFFB0;
+  --brutal-red: #FF5252;
+  --brutal-purple: #B084FF;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--brutal-white);
+  color: var(--brutal-black);
+}
+
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--brutal-white);
+  border-left: 4px solid var(--brutal-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neo-green);
+  border: 3px solid var(--brutal-black);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brutal-yellow);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--brutal-pink);
+  color: var(--brutal-white);
+}
+
+::-moz-selection {
+  background-color: var(--brutal-pink);
+  color: var(--brutal-white);
+}

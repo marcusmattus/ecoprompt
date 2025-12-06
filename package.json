@@ -1,0 +1,36 @@
+{
+  "name": "ecoprompt",
+  "version": "1.0.0",
+  "description": "EcoPrompt - Soft Brutalism Design System for AI Token Optimization",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@cityofzion/neon-core": "^5.8.0",
+    "@cityofzion/neon-js": "^5.8.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
+    "@rentfuse-labs/neo-wallet-adapter-base": "^0.5.0",
+    "@rentfuse-labs/neo-wallet-adapter-react": "^0.5.0",
+    "@rentfuse-labs/neo-wallet-adapter-react-ui": "^0.4.0",
+    "@rentfuse-labs/neo-wallet-adapter-wallets": "^0.5.0",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3",
+    "three": "^0.181.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.0.8"
+  }
+}
