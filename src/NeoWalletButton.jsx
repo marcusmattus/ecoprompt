@@ -16,8 +16,9 @@ export default function NeoWalletButton({ className = '' }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState(null);
 
-  // Debug wallet state
+  // Debug wallet state with NeoLine detection
   useEffect(() => {
+    console.log('=== Wallet Detection Debug ===');
     console.log('Wallet State:', {
       address: wallet.address,
       connected: wallet.connected,
@@ -28,6 +29,28 @@ export default function NeoWalletButton({ className = '' }) {
         readyState: w.readyState 
       }))
     });
+    
+    // Check if NeoLine is injected in window
+    console.log('NeoLine Detection:', {
+      hasNeoLine: typeof window.NEOLine !== 'undefined',
+      hasNeoDapi: typeof window.NEOLine?.NEO !== 'undefined',
+      neoLineVersion: window.NEOLine?.VERSION,
+      windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('neo'))
+    });
+    
+    // Try to detect NeoLine manually after a delay
+    const checkTimer = setTimeout(() => {
+      if (typeof window.NEOLine !== 'undefined') {
+        console.log('✅ NeoLine detected in window!');
+      } else {
+        console.warn('❌ NeoLine NOT detected. Please:');
+        console.warn('1. Check if NeoLine extension is installed');
+        console.warn('2. Check if extension is enabled');
+        console.warn('3. Refresh the page after installing');
+      }
+    }, 1000);
+    
+    return () => clearTimeout(checkTimer);
   }, [wallet]);
 
   // Format Neo address
@@ -51,11 +74,16 @@ export default function NeoWalletButton({ className = '' }) {
     setError(null);
     
     try {
+      console.log('=== Starting Connection Process ===');
       console.log('Attempting to connect to:', walletName);
       
       // Check if wallet is available
       const availableWallets = wallet.wallets || [];
-      console.log('Available wallets:', availableWallets.map(w => ({ name: w.name, readyState: w.readyState })));
+      console.log('Available wallets:', availableWallets.map(w => ({ 
+        name: w.name, 
+        readyState: w.readyState,
+        adapter: !!w.adapter 
+      })));
       
       const targetWallet = availableWallets.find(w => w.name === walletName);
       
@@ -63,19 +91,30 @@ export default function NeoWalletButton({ className = '' }) {
         throw new Error(`${walletName} wallet not found. Please install it from the Chrome Web Store.`);
       }
       
-      console.log('Target wallet readyState:', targetWallet.readyState);
+      console.log('Target wallet found:', {
+        name: targetWallet.name,
+        readyState: targetWallet.readyState,
+        hasAdapter: !!targetWallet.adapter,
+        adapterMethods: targetWallet.adapter ? Object.keys(targetWallet.adapter) : []
+      });
       
-      // More lenient readyState check - allow connection attempt even if state is unclear
-      const notDetected = targetWallet.readyState === 'NotDetected' || targetWallet.readyState === 'Unsupported';
-      if (notDetected) {
-        throw new Error(`${walletName} is not installed. Please install the extension and refresh the page.`);
+      // For NeoLine, check if it's in the window object
+      if (walletName === 'NeoLine') {
+        console.log('NeoLine specific check:', {
+          hasNEOLine: typeof window.NEOLine !== 'undefined',
+          hasNEO: typeof window.NEOLine?.NEO !== 'undefined'
+        });
+        
+        if (typeof window.NEOLine === 'undefined') {
+          throw new Error('NeoLine extension not detected. Please install NeoLine from Chrome Web Store and refresh the page.');
+        }
       }
       
-      // Call connect method with the wallet adapter
+      // Try to connect even if readyState is unclear
       console.log('Calling wallet.connect with adapter...');
       await wallet.connect(targetWallet.adapter);
       
-      console.log('Connected successfully! Now requesting signature...');
+      console.log('✅ Connected successfully! Now requesting signature...');
       
       // Request signature for authentication after connection
       try {

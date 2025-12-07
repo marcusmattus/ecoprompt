@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import NeoWalletButton, { NeoWalletInfoCard } from './NeoWalletButton';
 import NeoTransactionTest from './NeoTransactionTest';
+import NeoWalletDebug from './components/NeoWalletDebug';
 import ProfileSetup from './components/ProfileSetup';
 import { PluginManager } from './components/plugin-manager/PluginManager';
 import SpoonAIIntegration from './components/SpoonAIIntegration';
@@ -954,6 +955,9 @@ export default function EcoPromptApp() {
           )}
         </main>
       </div>
+
+      {/* Debug Panel */}
+      <NeoWalletDebug />
     </div>
   );
 }
