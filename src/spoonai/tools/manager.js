@@ -29,7 +29,15 @@ export class ToolManager {
       },
       execute: async ({ expression }) => {
         try {
-          return eval(expression);
+          // Safe math evaluation using Function constructor
+          // Only allows basic math operations
+          const sanitized = expression.replace(/[^0-9+\-*/().]/g, '');
+          if (sanitized !== expression) {
+            return 'Error: Invalid characters in expression';
+          }
+          // eslint-disable-next-line no-new-func
+          const result = new Function(`return ${sanitized}`)();
+          return result;
         } catch (error) {
           return `Error: ${error.message}`;
         }

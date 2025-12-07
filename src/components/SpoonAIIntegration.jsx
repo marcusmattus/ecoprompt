@@ -11,7 +11,10 @@ import {
   RefreshCw,
   Activity
 } from 'lucide-react';
-import useSpoonAI, { AGENT_TYPES } from '../hooks/useSpoonAI';
+import { useSpoonAI } from '../hooks/useSpoonAI';
+import { AgentType } from '../spoonai/types';
+
+const AGENT_TYPES = AgentType;
 
 const BaseCard = ({ children, className = '', color = 'bg-white' }) => (
   <div className={`
