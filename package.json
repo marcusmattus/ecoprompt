@@ -16,8 +16,8 @@
   "dependencies": {
     "@cityofzion/neon-core": "^5.8.0",
     "@cityofzion/neon-js": "^5.8.0",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.4.2",
+    "@react-three/drei": "^9.108.3",
+    "@react-three/fiber": "^8.16.8",
     "@rentfuse-labs/neo-wallet-adapter-base": "^0.5.0",
     "@rentfuse-labs/neo-wallet-adapter-react": "^0.5.0",
     "@rentfuse-labs/neo-wallet-adapter-react-ui": "^0.4.0",
