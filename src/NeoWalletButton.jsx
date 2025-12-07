@@ -45,7 +45,7 @@ export default function NeoWalletButton({ className = '' }) {
     }
   };
 
-  // Handle wallet connection with proper error handling
+  // Handle wallet connection with proper error handling and signature request
   const handleConnect = async (walletName) => {
     setIsConnecting(true);
     setError(null);
@@ -75,7 +75,34 @@ export default function NeoWalletButton({ className = '' }) {
       console.log('Calling wallet.connect with adapter...');
       await wallet.connect(targetWallet.adapter);
       
-      console.log('Connected successfully!');
+      console.log('Connected successfully! Now requesting signature...');
+      
+      // Request signature for authentication after connection
+      try {
+        const timestamp = Date.now();
+        const message = `Sign in to EcoPrompt\n\nTimestamp: ${timestamp}\nAddress: ${wallet.address || 'connecting...'}`;
+        
+        console.log('Requesting signature for message:', message);
+        
+        // Use the wallet adapter's signMessage method
+        if (targetWallet.adapter?.signMessage) {
+          const signature = await targetWallet.adapter.signMessage({ message });
+          console.log('Signature received:', signature);
+          
+          // Store signature authentication
+          localStorage.setItem('neo_wallet_signature', JSON.stringify({
+            address: wallet.address,
+            timestamp,
+            signature
+          }));
+        } else {
+          console.warn('Wallet does not support message signing, skipping...');
+        }
+      } catch (signErr) {
+        console.warn('Signature request failed or cancelled:', signErr);
+        // Don't fail the connection if signature is cancelled
+      }
+      
       setShowWalletModal(false);
       
       // Store wallet preference
@@ -102,8 +129,53 @@ export default function NeoWalletButton({ className = '' }) {
     try {
       await wallet.disconnect();
       localStorage.removeItem('neo_wallet_preference');
+      localStorage.removeItem('neo_wallet_signature');
     } catch (err) {
       console.error('Disconnect error:', err);
+    }
+  };
+
+  // Manual sign-in function for already connected wallets
+  const handleSignIn = async () => {
+    if (!wallet.connected || !wallet.connectedWallet) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
+    setIsConnecting(true);
+    setError(null);
+
+    try {
+      const timestamp = Date.now();
+      const message = `Sign in to EcoPrompt\n\nTimestamp: ${timestamp}\nAddress: ${wallet.address}`;
+      
+      console.log('Requesting signature for sign-in...');
+      
+      // Use the connected wallet adapter's signMessage method
+      if (wallet.connectedWallet.adapter?.signMessage) {
+        const signature = await wallet.connectedWallet.adapter.signMessage({ message });
+        console.log('Signature received:', signature);
+        
+        // Store signature authentication
+        localStorage.setItem('neo_wallet_signature', JSON.stringify({
+          address: wallet.address,
+          timestamp,
+          signature
+        }));
+        
+        alert('Successfully signed in! Signature stored.');
+      } else {
+        throw new Error('Wallet does not support message signing');
+      }
+    } catch (err) {
+      console.error('Sign-in error:', err);
+      if (err.message?.includes('rejected') || err.message?.includes('cancelled')) {
+        setError('Sign-in cancelled by user');
+      } else {
+        setError(err.message || 'Failed to sign message');
+      }
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -364,6 +436,29 @@ export default function NeoWalletButton({ className = '' }) {
         ) : (
           <Copy size={16} strokeWidth={3} />
         )}
+      </button>
+
+      {/* Sign In Button - Request Signature */}
+      <button
+        onClick={handleSignIn}
+        disabled={isConnecting}
+        className="
+          px-4 py-2
+          bg-[#FFD93D]
+          border-4 border-[#0A0A0F]
+          rounded-[16px]
+          font-bold text-sm uppercase
+          shadow-[4px_4px_0px_0px_rgba(10,10,15,1)]
+          hover:bg-[#FF6BCB]
+          active:translate-x-[2px] active:translate-y-[2px]
+          active:shadow-none
+          transition-all duration-150
+          disabled:opacity-50 disabled:cursor-not-allowed
+          whitespace-nowrap
+        "
+        title="Sign in with signature"
+      >
+        {isConnecting ? '...' : '🔐 Sign In'}
       </button>
 
       {/* Disconnect Button */}
