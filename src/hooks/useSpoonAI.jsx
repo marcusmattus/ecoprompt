@@ -16,6 +16,19 @@ export function useSpoonAI(config = {}) {
     const initSpoonAI = async () => {
       try {
         setLoading(true);
+        
+        // Check if API keys are available
+        const hasAPIKeys = import.meta.env.VITE_OPENAI_API_KEY || 
+                          import.meta.env.VITE_ANTHROPIC_API_KEY || 
+                          import.meta.env.VITE_GOOGLE_API_KEY;
+        
+        if (!hasAPIKeys) {
+          console.warn('SpoonAI: No API keys found. Running in demo mode.');
+          setError(new Error('No API keys configured'));
+          setLoading(false);
+          return;
+        }
+        
         const instance = new SpoonAICore(config);
         await instance.initialize();
         instanceRef.current = instance;
@@ -33,7 +46,7 @@ export function useSpoonAI(config = {}) {
 
     return () => {
       if (instanceRef.current) {
-        instanceRef.current.shutdown();
+        instanceRef.current.shutdown().catch(console.error);
       }
     };
   }, []);
