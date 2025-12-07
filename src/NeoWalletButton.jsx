@@ -77,40 +77,59 @@ export default function NeoWalletButton({ className = '' }) {
       console.log('=== Starting Connection Process ===');
       console.log('Attempting to connect to:', walletName);
       
-      // Check if wallet is available
-      const availableWallets = wallet.wallets || [];
-      console.log('Available wallets:', availableWallets.map(w => ({ 
-        name: w.name, 
-        readyState: w.readyState,
-        adapter: !!w.adapter 
-      })));
+      // For NeoLine, use direct window.NEOLine API for popup
+      if (walletName === 'NeoLine') {
+        if (typeof window.NEOLine === 'undefined') {
+          throw new Error('NeoLine extension not detected. Please install NeoLine from Chrome Web Store and refresh the page.');
+        }
+        
+        console.log('Using direct NeoLine API for popup...');
+        const neolineInstance = new window.NEOLine.Init();
+        
+        // This should trigger the NeoLine popup
+        const accountData = await neolineInstance.getAccount();
+        console.log('✅ NeoLine connected via popup:', accountData);
+        
+        // Now connect through the adapter with the account info
+        const availableWallets = wallet.wallets || [];
+        const targetWallet = availableWallets.find(w => w.name === walletName);
+        
+        if (targetWallet && targetWallet.adapter) {
+          await wallet.connect(targetWallet.adapter);
+        }
+        
+        // Request signature for authentication
+        try {
+          const timestamp = Date.now();
+          const message = `Sign in to EcoPrompt\n\nTimestamp: ${timestamp}\nAddress: ${accountData.address}`;
+          
+          console.log('Requesting signature for message via popup...');
+          const signature = await neolineInstance.signMessage({ message });
+          console.log('Signature received:', signature);
+          
+          // Store signature authentication
+          localStorage.setItem('neo_wallet_signature', JSON.stringify({
+            address: accountData.address,
+            timestamp,
+            signature
+          }));
+        } catch (signErr) {
+          console.warn('Signature request failed or cancelled:', signErr);
+        }
+        
+        setShowWalletModal(false);
+        localStorage.setItem('neo_wallet_preference', walletName);
+        return;
+      }
       
+      // For other wallets, use standard adapter flow
+      const availableWallets = wallet.wallets || [];
       const targetWallet = availableWallets.find(w => w.name === walletName);
       
       if (!targetWallet) {
         throw new Error(`${walletName} wallet not found. Please install it from the Chrome Web Store.`);
       }
       
-      console.log('Target wallet found:', {
-        name: targetWallet.name,
-        readyState: targetWallet.readyState,
-        hasAdapter: !!targetWallet.adapter,
-        adapterMethods: targetWallet.adapter ? Object.keys(targetWallet.adapter) : []
-      });
-      
-      // For NeoLine, check if it's in the window object
-      if (walletName === 'NeoLine') {
-        console.log('NeoLine specific check:', {
-          hasNEOLine: typeof window.NEOLine !== 'undefined',
-          hasNEO: typeof window.NEOLine?.NEO !== 'undefined'
-        });
-        
-        if (typeof window.NEOLine === 'undefined') {
-          throw new Error('NeoLine extension not detected. Please install NeoLine from Chrome Web Store and refresh the page.');
-        }
-      }
-      
-      // Try to connect even if readyState is unclear
       console.log('Calling wallet.connect with adapter...');
       await wallet.connect(targetWallet.adapter);
       
@@ -123,12 +142,10 @@ export default function NeoWalletButton({ className = '' }) {
         
         console.log('Requesting signature for message:', message);
         
-        // Use the wallet adapter's signMessage method
         if (targetWallet.adapter?.signMessage) {
           const signature = await targetWallet.adapter.signMessage({ message });
           console.log('Signature received:', signature);
           
-          // Store signature authentication
           localStorage.setItem('neo_wallet_signature', JSON.stringify({
             address: wallet.address,
             timestamp,
@@ -139,18 +156,14 @@ export default function NeoWalletButton({ className = '' }) {
         }
       } catch (signErr) {
         console.warn('Signature request failed or cancelled:', signErr);
-        // Don't fail the connection if signature is cancelled
       }
       
       setShowWalletModal(false);
-      
-      // Store wallet preference
       localStorage.setItem('neo_wallet_preference', walletName);
       
     } catch (err) {
       console.error('Connection error:', err);
       
-      // User-friendly error messages
       if (err.message?.includes('not installed') || err.message?.includes('not found') || err.message?.includes('not detected')) {
         setError(`${walletName} wallet not installed. Please install it first.`);
       } else if (err.message?.includes('rejected') || err.message?.includes('cancelled') || err.message?.includes('denied')) {
@@ -176,7 +189,7 @@ export default function NeoWalletButton({ className = '' }) {
 
   // Manual sign-in function for already connected wallets
   const handleSignIn = async () => {
-    if (!wallet.connected || !wallet.connectedWallet) {
+    if (!wallet.connected) {
       setError('Please connect your wallet first');
       return;
     }
@@ -190,12 +203,27 @@ export default function NeoWalletButton({ className = '' }) {
       
       console.log('Requesting signature for sign-in...');
       
-      // Use the connected wallet adapter's signMessage method
-      if (wallet.connectedWallet.adapter?.signMessage) {
+      // Use direct NeoLine API if available
+      if (wallet.connectedWallet?.name === 'NeoLine' && typeof window.NEOLine !== 'undefined') {
+        const neolineInstance = new window.NEOLine.Init();
+        const signature = await neolineInstance.signMessage({ message });
+        console.log('Signature received via NeoLine popup:', signature);
+        
+        localStorage.setItem('neo_wallet_signature', JSON.stringify({
+          address: wallet.address,
+          timestamp,
+          signature
+        }));
+        
+        alert('Successfully signed in! Signature stored.');
+        return;
+      }
+      
+      // Fallback to adapter method
+      if (wallet.connectedWallet?.adapter?.signMessage) {
         const signature = await wallet.connectedWallet.adapter.signMessage({ message });
         console.log('Signature received:', signature);
         
-        // Store signature authentication
         localStorage.setItem('neo_wallet_signature', JSON.stringify({
           address: wallet.address,
           timestamp,
